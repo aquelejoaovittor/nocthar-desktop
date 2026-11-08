@@ -8,7 +8,6 @@ gi.require_version("Gtk", "3.0")
 gi.require_version("GdkPixbuf", "2.0")
 from gi.repository import Gtk, Gdk, GLib, GdkPixbuf
 
-# Garante que as pastas XDG do usuário existam, independente de onde o app foi instalado
 os.makedirs(os.path.expanduser("~/.config/nocthar/logs"), exist_ok=True)
 os.makedirs(os.path.expanduser("~/.local/share/nocthar/backups"), exist_ok=True)
 os.makedirs(os.path.expanduser("~/.local/share/nocthar/state"), exist_ok=True)
@@ -20,7 +19,6 @@ class NoctharApp(Gtk.Window):
         self.set_default_size(1000, 700)
         self.set_border_width(0)
 
-        # Detecta se está rodando da pasta do projeto ou de /usr/share/nocthar
         current_dir = os.path.dirname(os.path.abspath(__file__))
         if current_dir.startswith("/usr/share/nocthar"):
             self.project_root = "/usr/share/nocthar"
@@ -30,7 +28,6 @@ class NoctharApp(Gtk.Window):
         self.wallpaper_dir = os.path.join(self.project_root, "assets", "wallpapers")
         self.backup_dir = os.path.join(os.path.expanduser("~"), ".local", "share", "nocthar", "backups")
 
-        # Carregar CSS
         css_provider = Gtk.CssProvider()
         css_path = os.path.join(os.path.dirname(__file__), "style.css")
         if os.path.exists(css_path):
@@ -39,11 +36,9 @@ class NoctharApp(Gtk.Window):
                 Gdk.Screen.get_default(), css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
             )
 
-        # Layout Principal
         main_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=0)
         self.add(main_box)
 
-        # Sidebar
         sidebar = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
         sidebar.get_style_context().add_class("sidebar")
         sidebar.set_size_request(200, -1)
@@ -59,7 +54,6 @@ class NoctharApp(Gtk.Window):
             
         main_box.pack_start(sidebar, False, False, 0)
 
-        # Área de Conteúdo com Abas
         self.notebook = Gtk.Notebook()
         self.notebook.set_border_width(15)
         main_box.pack_start(self.notebook, True, True, 0)
@@ -70,7 +64,6 @@ class NoctharApp(Gtk.Window):
         self.build_system_tab()
         self.build_backup_tab()
 
-        # Log console
         self.log_view = Gtk.TextView()
         self.log_view.set_editable(False)
         self.log_view.get_style_context().add_class("log-view")
@@ -167,12 +160,13 @@ class NoctharApp(Gtk.Window):
         self.notebook.append_page(vbox, Gtk.Label(label="Aparência"))
 
     def build_system_tab(self):
-        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=20)
+        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=15)
         vbox.set_border_width(15)
         title = Gtk.Label()
-        title.set_markup("<span size='x-large' weight='bold' color='#00D2FF'>Sistema: Caja e Terminal</span>")
+        title.set_markup("<span size='x-large' weight='bold' color='#00D2FF'>Sistema: Caja, Terminal e Bloqueio</span>")
         title.set_xalign(0)
         vbox.pack_start(title, False, False, 0)
+        
         lbl_caja = Gtk.Label()
         lbl_caja.set_markup("<b>Caja (Gerenciador de Arquivos)</b>")
         lbl_caja.set_xalign(0)
@@ -191,6 +185,7 @@ class NoctharApp(Gtk.Window):
         btn_apply_caja.get_style_context().add_class("profile-btn")
         btn_apply_caja.connect("clicked", self.on_apply_caja)
         vbox.pack_start(btn_apply_caja, False, False, 10)
+        
         lbl_term = Gtk.Label()
         lbl_term.set_markup("<b>Terminal (Transparência)</b>")
         lbl_term.set_xalign(0)
@@ -208,6 +203,17 @@ class NoctharApp(Gtk.Window):
         btn_apply_term.get_style_context().add_class("profile-btn-abyss")
         btn_apply_term.connect("clicked", self.on_apply_term_opacity)
         vbox.pack_start(btn_apply_term, False, False, 10)
+
+        # --- NOVO: Tela de Bloqueio ---
+        lbl_lock = Gtk.Label()
+        lbl_lock.set_markup("<b>Tela de Bloqueio (Screensaver)</b>")
+        lbl_lock.set_xalign(0)
+        vbox.pack_start(lbl_lock, False, False, 10)
+        btn_apply_lock = Gtk.Button(label="Aplicar Wallpaper Atual na Tela de Bloqueio")
+        btn_apply_lock.get_style_context().add_class("profile-btn")
+        btn_apply_lock.connect("clicked", self.on_apply_lockscreen)
+        vbox.pack_start(btn_apply_lock, False, False, 10)
+
         self.notebook.append_page(vbox, Gtk.Label(label="Sistema"))
 
     def build_backup_tab(self):
@@ -299,6 +305,10 @@ class NoctharApp(Gtk.Window):
         opacity = int(self.opacity_scale.get_value())
         self.log(f"\n--- Configurando Transparência do Terminal: {opacity}% ---")
         threading.Thread(target=self.run_bash, args=("desktop/configure-terminal-opacity.sh", str(opacity)), daemon=True).start()
+
+    def on_apply_lockscreen(self, widget):
+        self.log("\n--- Configurando Tela de Bloqueio ---")
+        threading.Thread(target=self.run_bash, args=("system/configure-lockscreen.sh",), daemon=True).start()
 
     def on_create_backup(self, widget):
         self.log("\n--- Criando Backup ---")
