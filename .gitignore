@@ -1,0 +1,9 @@
+# NOCTHAR Ignores
+logs/
+backups/
+*.log
+*.tar.gz
+__pycache__/
+*.pyc
+.cache/
+assets/wallpapers/*.svg

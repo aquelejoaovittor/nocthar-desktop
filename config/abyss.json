@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "profile_name": "NOCTHAR ABYSS",
+  "description": "Gothic, darkwave, vermelho profundo.",
+  "components": {
+    "gtk": { "theme": "Mint-Y-Dark-Red" },
+    "icons": { "theme": "Papirus-Dark" },
+    "cursors": { "theme": "Bibata-Modern-Ice" },
+    "fonts": { "interface": "Inter 10" },
+    "terminal": {
+      "bg_color": "rgb(13,0,0)",
+      "fg_color": "rgb(168,32,53)",
+      "cursor_color": "rgb(255,50,50)"
+    },
+    "panel": { "position": "bottom", "size": 36 }
+  }
+}

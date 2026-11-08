@@ -1,0 +1,64 @@
+/* NOCTHAR DESKTOP - Estilo GTK3 */
+
+window {
+    background-color: #090B10; /* Preto Mineral */
+    color: #C3CBD5;            /* Prata */
+    font-family: "Inter", sans-serif;
+}
+
+headerbar {
+    background-color: #151B25; /* Grafite */
+    border-bottom: 1px solid #263344;
+    color: #00D2FF;            /* Ciano Elétrico */
+}
+
+.sidebar {
+    background-color: #151B25;
+    border-right: 1px solid #263344;
+}
+
+.sidebar-button {
+    background-color: transparent;
+    border: none;
+    color: #C3CBD5;
+    padding: 12px;
+    border-radius: 0;
+}
+
+.sidebar-button:hover {
+    background-color: #263344;
+    color: #00D2FF;
+}
+
+.profile-btn {
+    background-color: #1B49A6; /* Azul Profundo */
+    color: #FFFFFF;
+    border: 1px solid #00D2FF;
+    border-radius: 6px;
+    padding: 10px 20px;
+    font-weight: bold;
+    margin: 10px;
+}
+
+.profile-btn:hover {
+    background-color: #00D2FF;
+    color: #090B10;
+}
+
+.profile-btn-abyss {
+    background-color: #A82035; /* Vermelho Escuro */
+    border: 1px solid #FF4D4D;
+}
+
+.profile-btn-abyss:hover {
+    background-color: #FF4D4D;
+}
+
+.log-view {
+    background-color: #000000;
+    color: #00FF41; /* Verde Matrix para o console */
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    padding: 10px;
+    border-radius: 4px;
+}

@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "profile_name": "NOCTHAR CORE",
+  "author": "NOCTHAR Project",
+  "description": "Minimalista, grafite, preto mineral e prata.",
+  "components": {
+    "gtk": {
+      "theme": "Mint-Y-Dark-Aqua",
+      "dark_mode": true
+    },
+    "icons": {
+      "theme": "Papirus-Dark"
+    },
+    "cursors": {
+      "theme": "Bibata-Modern-Ice"
+    },
+    "fonts": {
+      "interface": "Inter 10",
+      "monospace": "JetBrains Mono 11"
+    },
+    "terminal": {
+      "opacity": 10
+    },
+    "panel": {
+      "position": "bottom",
+      "size": 36,
+      "color": "#090B10"
+    }
+  }
+}

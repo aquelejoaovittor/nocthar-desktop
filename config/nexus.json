@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "profile_name": "NOCTHAR NEXUS",
+  "description": "Tecnológico, Y2K, ciano elétrico e azul profundo.",
+  "components": {
+    "gtk": { "theme": "Mint-Y-Dark-Blue" },
+    "icons": { "theme": "Papirus-Dark" },
+    "cursors": { "theme": "Bibata-Modern-Ice" },
+    "fonts": { "interface": "Inter 10" },
+    "terminal": {
+      "bg_color": "rgb(0,15,30)",
+      "fg_color": "rgb(0,210,255)",
+      "cursor_color": "rgb(27,73,166)"
+    },
+    "panel": { "position": "bottom", "size": 36 }
+  }
+}
