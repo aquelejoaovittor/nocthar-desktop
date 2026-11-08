@@ -5,7 +5,7 @@
   "description": "Minimalista, grafite, preto mineral e prata.",
   "components": {
     "gtk": {
-      "theme": "Mint-Y-Dark-Aqua",
+      "theme": "NOCTHAR-CORE",
       "dark_mode": true
     },
     "icons": {
@@ -19,12 +19,13 @@
       "monospace": "JetBrains Mono 11"
     },
     "terminal": {
-      "opacity": 10
+      "bg_color": "rgb(9,11,16)",
+      "fg_color": "rgb(195,203,213)",
+      "cursor_color": "rgb(0,210,255)"
     },
     "panel": {
       "position": "bottom",
-      "size": 36,
-      "color": "#090B10"
+      "size": 36
     }
   }
 }
