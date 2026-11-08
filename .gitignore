@@ -7,3 +7,7 @@ __pycache__/
 *.pyc
 .cache/
 assets/wallpapers/*.svg
+
+# Build artifacts
+build_deb/
+*.deb

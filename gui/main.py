@@ -8,23 +8,36 @@ gi.require_version("Gtk", "3.0")
 gi.require_version("GdkPixbuf", "2.0")
 from gi.repository import Gtk, Gdk, GLib, GdkPixbuf
 
+# Garante que as pastas XDG do usuário existam, independente de onde o app foi instalado
+os.makedirs(os.path.expanduser("~/.config/nocthar/logs"), exist_ok=True)
+os.makedirs(os.path.expanduser("~/.local/share/nocthar/backups"), exist_ok=True)
+os.makedirs(os.path.expanduser("~/.local/share/nocthar/state"), exist_ok=True)
+os.makedirs(os.path.expanduser("~/.local/share/nocthar/cache"), exist_ok=True)
+
 class NoctharApp(Gtk.Window):
     def __init__(self):
         super().__init__(title="NOCTHAR DESKTOP")
         self.set_default_size(1000, 700)
         self.set_border_width(0)
 
-        self.project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        # Detecta se está rodando da pasta do projeto ou de /usr/share/nocthar
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        if current_dir.startswith("/usr/share/nocthar"):
+            self.project_root = "/usr/share/nocthar"
+        else:
+            self.project_root = os.path.dirname(current_dir)
+
         self.wallpaper_dir = os.path.join(self.project_root, "assets", "wallpapers")
         self.backup_dir = os.path.join(os.path.expanduser("~"), ".local", "share", "nocthar", "backups")
 
         # Carregar CSS
         css_provider = Gtk.CssProvider()
         css_path = os.path.join(os.path.dirname(__file__), "style.css")
-        css_provider.load_from_path(css_path)
-        Gtk.StyleContext.add_provider_for_screen(
-            Gdk.Screen.get_default(), css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
-        )
+        if os.path.exists(css_path):
+            css_provider.load_from_path(css_path)
+            Gtk.StyleContext.add_provider_for_screen(
+                Gdk.Screen.get_default(), css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+            )
 
         # Layout Principal
         main_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=0)
@@ -66,7 +79,6 @@ class NoctharApp(Gtk.Window):
 
         self.log("Interface gráfica NOCTHAR inicializada.")
 
-    # --- Abas anteriores mantidas iguais ---
     def build_profiles_tab(self):
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=15)
         vbox.set_border_width(15)
@@ -154,25 +166,19 @@ class NoctharApp(Gtk.Window):
         vbox.pack_start(btn_apply_cursor, False, False, 10)
         self.notebook.append_page(vbox, Gtk.Label(label="Aparência"))
 
-    # --- NOVA ABA: SISTEMA (CAJA E TERMINAL) ---
     def build_system_tab(self):
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=20)
         vbox.set_border_width(15)
-
         title = Gtk.Label()
         title.set_markup("<span size='x-large' weight='bold' color='#00D2FF'>Sistema: Caja e Terminal</span>")
         title.set_xalign(0)
         vbox.pack_start(title, False, False, 0)
-
-        # Configurações do Caja
         lbl_caja = Gtk.Label()
         lbl_caja.set_markup("<b>Caja (Gerenciador de Arquivos)</b>")
         lbl_caja.set_xalign(0)
         vbox.pack_start(lbl_caja, False, False, 0)
-
         self.check_hidden = Gtk.CheckButton(label="Mostrar arquivos ocultos")
         vbox.pack_start(self.check_hidden, False, False, 0)
-
         box_caja_view = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
         box_caja_view.pack_start(Gtk.Label(label="Modo de Visualização Padrão:"), False, False, 0)
         self.caja_view_combo = Gtk.ComboBoxText()
@@ -181,34 +187,27 @@ class NoctharApp(Gtk.Window):
         self.caja_view_combo.set_active(0)
         box_caja_view.pack_start(self.caja_view_combo, False, False, 0)
         vbox.pack_start(box_caja_view, False, False, 0)
-
         btn_apply_caja = Gtk.Button(label="Aplicar Configurações do Caja")
         btn_apply_caja.get_style_context().add_class("profile-btn")
         btn_apply_caja.connect("clicked", self.on_apply_caja)
         vbox.pack_start(btn_apply_caja, False, False, 10)
-
-        # Configurações do Terminal
         lbl_term = Gtk.Label()
         lbl_term.set_markup("<b>Terminal (Transparência)</b>")
         lbl_term.set_xalign(0)
         vbox.pack_start(lbl_term, False, False, 10)
-
         box_term = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
         box_term.pack_start(Gtk.Label(label="Transparência (0% a 50%):"), False, False, 0)
-        
         self.opacity_scale = Gtk.Scale.new_with_range(Gtk.Orientation.HORIZONTAL, 0, 50, 1)
         self.opacity_scale.set_value(10)
         self.opacity_scale.set_draw_value(True)
         self.opacity_scale.set_value_pos(Gtk.PositionType.RIGHT)
         box_term.pack_start(self.opacity_scale, True, True, 0)
         vbox.pack_start(box_term, False, False, 0)
-
         btn_apply_term = Gtk.Button(label="Aplicar Transparência do Terminal")
         btn_apply_term.get_style_context().add_class("profile-btn")
         btn_apply_term.get_style_context().add_class("profile-btn-abyss")
         btn_apply_term.connect("clicked", self.on_apply_term_opacity)
         vbox.pack_start(btn_apply_term, False, False, 10)
-
         self.notebook.append_page(vbox, Gtk.Label(label="Sistema"))
 
     def build_backup_tab(self):
@@ -239,7 +238,6 @@ class NoctharApp(Gtk.Window):
         self.refresh_backup_list()
         self.notebook.append_page(vbox, Gtk.Label(label="Backup"))
 
-    # --- Funções de carregamento e eventos ---
     def load_system_fonts(self):
         try:
             out = subprocess.check_output(["fc-list", ":family"], text=True)
